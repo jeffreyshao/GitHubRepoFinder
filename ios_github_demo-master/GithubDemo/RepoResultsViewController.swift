@@ -10,22 +10,23 @@ import UIKit
 import MBProgressHUD
 
 // Main ViewController
-class RepoResultsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class RepoResultsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SettingsPresentingViewControllerDelegate {
 
     @IBOutlet weak var tableView: UITableView!
 
     var searchBar: UISearchBar!
     var searchSettings = GithubRepoSearchSettings()
-
+    
     var repos: [GithubRepo]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        searchSettings.minStars = 0
+        
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.estimatedRowHeight = 100
-        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.rowHeight = 120
         
         tableView.reloadData()
 
@@ -81,6 +82,23 @@ class RepoResultsViewController: UIViewController, UITableViewDelegate, UITableV
         else{
             return repos.count
         }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let navController = segue.destination as! UINavigationController
+        let vc = navController.topViewController as! SearchSettingsViewController
+        vc.searchSettings = searchSettings
+        vc.delegate = self
+        
+    }
+    
+    func didSaveSettings(settings: GithubRepoSearchSettings) {
+        searchSettings.minStars = settings.minStars
+        doSearch()
+    }
+    
+    func didCancelSettings() {
+        
     }
     
 }
